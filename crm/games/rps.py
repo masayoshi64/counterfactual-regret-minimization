@@ -1,27 +1,45 @@
 from enum import IntEnum
-from typing import List
 
-from .normal_form_game import NormalFormGame
+from .game_base import Node, Game
 
 
-# 列挙型の定義
 class Hand(IntEnum):
     R = 0
     P = 1
     S = 2
 
 
-class RPS(NormalFormGame):
-    def __init__(self, players_num):
-        self.players = list(range(players_num))
+class RPSNode(Node):
+    def __init__(self, information):
+        super().__init__(information)
 
-    def actions(self, player: int) -> List[int]:
+    @property
+    def actions(self):
         return [Hand.R, Hand.P, Hand.S]
 
-    def payoff(self, actions) -> List[float]:
-        u = [0.0] * len(actions)
 
-        hands = list(set(actions))
+class RPS(Game):
+    def __init__(self, num_players=2):
+        self.num_players = num_players
+        super().__init__()
+
+    @property
+    def players(self):
+        return list(range(self.num_players))
+
+    def player(self, hist):
+        return len(hist) % self.num_players
+
+    def create_node(self, info):
+        return RPSNode(info)
+
+    def is_terminal(self, hist):
+        return len(hist) == self.num_players
+
+    def payoff(self, hist):
+        u = [0.0] * self.num_players
+
+        hands = list(set(hist))
         if len(hands) != 2:  # あいこなら全員利得0
             return u
 
@@ -35,15 +53,11 @@ class RPS(NormalFormGame):
             win_hand, lose_hand = lose_hand, win_hand
 
         for player in self.players:
-            if actions[player] == win_hand:
+            if hist[player] == win_hand:
                 u[player] = 1
             else:
                 u[player] = -1
         return u
 
-    def play(self, strategy: List[List[float]]) -> List[int]:
-        actions = []
-        for player in self.players:
-            action = self.generate_action(player, strategy[player])
-            actions.append(action)
-        return actions
+    def information(self, hist):
+        return self.player(hist)
