@@ -13,6 +13,7 @@
     "python.formatting.provider": "black",
     "autoDocstring.docstringFormat": "google",
     "cSpell.words": [
+        "Guriko",
         "probs"
     ],
     "python.testing.pytestArgs": [
