@@ -1,5 +1,6 @@
 import copy
 from typing import List, Any
+from collections import defaultdict
 
 from tqdm import tqdm
 
@@ -22,7 +23,7 @@ class CRM:
             self.node_dict[info] = node
         node = self.node_dict[info]
         strategy = node.get_strategy(prob[player])
-        player_util = [0.0] * node.num_actions
+        player_util = defaultdict(float)
         node_util = [0.0] * self.game.num_players
         for action in node.actions:
             next_hist = copy.deepcopy(hist)

@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import List
 
 
@@ -5,25 +6,33 @@ class Node:
     def __init__(self, information):
         self.information = information
         self.num_actions = len(self.actions)
-        self.regret_sum = [0.0] * self.num_actions
-        self.strategy_sum = [0.0] * self.num_actions
+        self.regret_sum = defaultdict(float)
+        self.strategy_sum = defaultdict(float)
 
-    def get_strategy(self, p: float) -> List[float]:
-        normalizing_sum = sum(max(0, regret) for regret in self.regret_sum)
+    def get_strategy(self, p: float) -> dict:
+        normalizing_sum = sum(
+            max(0, self.regret_sum[action]) for action in self.actions
+        )
         if normalizing_sum > 0:
-            strategy = [max(0, regret) / normalizing_sum for regret in self.regret_sum]
+            strategy = {
+                action: max(0, self.regret_sum[action]) / normalizing_sum
+                for action in self.actions
+            }
         else:
-            strategy = [1 / self.num_actions] * self.num_actions
+            strategy = {action: 1 / self.num_actions for action in self.actions}
         for action in self.actions:
             self.strategy_sum[action] += p * strategy[action]
         return strategy
 
-    def get_average_strategy(self) -> List[float]:
-        normalizing_sum = sum(self.strategy_sum)
+    def get_average_strategy(self) -> dict:
+        normalizing_sum = sum(p for p in self.strategy_sum.values())
         if normalizing_sum > 0:
-            strategy = [x / normalizing_sum for x in self.strategy_sum]
+            strategy = {
+                action: self.strategy_sum[action] / normalizing_sum
+                for action in self.actions
+            }
         else:
-            strategy = [1 / self.num_actions] * self.num_actions
+            strategy = {action: 1 / self.num_actions for action in self.actions}
         return strategy
 
     def __str__(self) -> str:
