@@ -47,6 +47,9 @@ class Game:
     def __init__(self):
         self.num_players = len(self.players)
 
+    def reset(self) -> None:
+        return
+
     @property
     def players(self) -> List[int]:
         raise NotImplementedError()

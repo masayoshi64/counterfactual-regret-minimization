@@ -44,4 +44,5 @@ class CRM:
 
     def train(self, iterations):
         for i in tqdm(range(iterations)):
+            self.game.reset()
             self.cfr([], [1] * self.game.num_players)
